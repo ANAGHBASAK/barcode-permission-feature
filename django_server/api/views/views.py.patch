@@ -1,0 +1,22 @@
+--- a/django_server/api/views/views.py
++++ b/django_server/api/views/views.py
+@@ -3013,6 +3013,9 @@ def build_access_policy(slide):
+     :rtype: str
+     :return: The signature in a compact string.
+     """
++    morphle_app = os.environ.get('MORPHLE_APP', '')
++    if morphle_app and morphle_app not in sys.path:
++        sys.path.insert(0, morphle_app)
+     from bin.signedcookie import url_b64encode
+     date_less_than = datetime.datetime.today() + timedelta(hours=2)
+     moment = int(datetime2timestamp(date_less_than))
+@@ -3082,6 +3085,9 @@ def generate_key_pair_if_absent():
+ 
+ @api_view(['GET'])
+ def set_signed_cookies(request):
++    morphle_app = os.environ.get('MORPHLE_APP', '')
++    if morphle_app and morphle_app not in sys.path:
++        sys.path.insert(0, morphle_app)
+     from bin.signedcookie import make_signed_cookie
+     slide_id = request.GET.get('slide_id')
+     remote_url = request.GET.get('remote_url', None)

@@ -14,6 +14,7 @@ This feature ensures that barcode-related UI elements are only visible to users 
 
 ## Files Modified
 
+### Frontend Files:
 1. **`frontend/src/component/dashboard/slidelist_utils.js`**
    - Modified `getLabelComponent()` function to check `barcode_app` permission before rendering barcode image
 
@@ -24,6 +25,16 @@ This feature ensures that barcode-related UI elements are only visible to users 
 3. **`frontend/src/component/gammaviewer/sidebarBottom_apps/barcode.js`**
    - Added import for permission checking
    - Added permission check in `render()` method to hide component when permission is missing
+
+### Backend Files:
+4. **`django_server/api/resources/default_policies.json`**
+   - Removed `barcode_app` from all three default policies (viewer-policy, staff-policy, anonymous-share-policy)
+   - Makes `barcode_app` a standalone permission that must be granted directly to users
+
+5. **`django_server/api/views/views.py`** (Patch file included)
+   - Fix for `ModuleNotFoundError: No module named 'bin'` in `build_access_policy()` and `set_signed_cookies()` functions
+   - Adds `MORPHLE_APP` to `sys.path` before importing `bin.signedcookie`
+   - **Note:** This is a bug fix required for the app to work properly when loading slides
 
 ## Dependencies
 

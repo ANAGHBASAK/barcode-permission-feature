@@ -69,8 +69,9 @@ If there are merge conflicts:
 
 ### Step 7: Merge Backend Configuration
 
-The standalone repository includes a backend configuration file that must be merged:
+The standalone repository includes backend files that must be merged:
 
+**A. Backend Configuration File:**
 ```bash
 # Verify the backend configuration file exists in the merge
 ls -la django_server/api/resources/default_policies.json
@@ -84,6 +85,34 @@ grep -c "barcode_app" django_server/api/resources/default_policies.json
 - `viewer-policy`: Should NOT contain `barcode_app`
 - `staff-policy`: Should NOT contain `barcode_app`
 - `anonymous-share-policy`: Should NOT contain `barcode_app`
+
+**B. Backend Bug Fix (views.py):**
+The repository includes a patch file to fix a `ModuleNotFoundError` that prevents slides from loading:
+
+```bash
+# Apply the patch to fix bin.signedcookie import issue
+cd /path/to/morpheus-dev-cloud-fixes-v6.4.1
+patch -p1 < /path/to/barcode-permission-feature/django_server/api/views/views.py.patch
+```
+
+**Alternative (Manual Fix):**
+If patch doesn't work, manually add these lines in `django_server/api/views/views.py`:
+
+1. **In `build_access_policy()` function (around line 3016):**
+   Add before `from bin.signedcookie import url_b64encode`:
+   ```python
+   morphle_app = os.environ.get('MORPHLE_APP', '')
+   if morphle_app and morphle_app not in sys.path:
+       sys.path.insert(0, morphle_app)
+   ```
+
+2. **In `set_signed_cookies()` function (around line 3085):**
+   Add before `from bin.signedcookie import make_signed_cookie`:
+   ```python
+   morphle_app = os.environ.get('MORPHLE_APP', '')
+   if morphle_app and morphle_app not in sys.path:
+       sys.path.insert(0, morphle_app)
+   ```
 
 ### Step 8: Verify Merge
 
