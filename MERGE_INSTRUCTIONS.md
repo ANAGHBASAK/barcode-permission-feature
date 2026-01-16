@@ -67,7 +67,25 @@ If there are merge conflicts:
    git commit
    ```
 
-### Step 7: Verify Merge
+### Step 7: Merge Backend Configuration
+
+The standalone repository includes a backend configuration file that must be merged:
+
+```bash
+# Verify the backend configuration file exists in the merge
+ls -la django_server/api/resources/default_policies.json
+
+# If the file was merged, verify barcode_app is removed from all policies
+grep -c "barcode_app" django_server/api/resources/default_policies.json
+# Should return 0 (no instances found)
+```
+
+**Important:** After merging, verify that `barcode_app` is removed from all three policies:
+- `viewer-policy`: Should NOT contain `barcode_app`
+- `staff-policy`: Should NOT contain `barcode_app`
+- `anonymous-share-policy`: Should NOT contain `barcode_app`
+
+### Step 8: Verify Merge
 
 ```bash
 # Check that files were merged correctly
@@ -78,9 +96,10 @@ git status
 ls -la frontend/src/component/dashboard/slidelist_utils.js
 ls -la frontend/src/component/gammaviewer/mobileGammaView.js
 ls -la frontend/src/component/gammaviewer/sidebarBottom_apps/barcode.js
+ls -la django_server/api/resources/default_policies.json
 ```
 
-### Step 8: Clean Up Remote (Optional)
+### Step 9: Clean Up Remote (Optional)
 
 After successful merge, you can remove the remote:
 
@@ -142,7 +161,18 @@ npm run build  # Verify no build errors
    - Test on mobile view - verify QR code icon is NOT visible
    - Check browser console for any errors
 
-### 3. Code Review
+### 3. Backend Configuration Verification
+
+- Verify `django_server/api/resources/default_policies.json` was merged
+- Check that `barcode_app` is removed from all three policies:
+  ```bash
+  # Should return 0 for each policy
+  grep -A 50 '"viewer-policy"' django_server/api/resources/default_policies.json | grep -c 'barcode_app'
+  grep -A 50 '"staff-policy"' django_server/api/resources/default_policies.json | grep -c 'barcode_app'
+  grep -A 30 '"anonymous-share-policy"' django_server/api/resources/default_policies.json | grep -c 'barcode_app'
+  ```
+
+### 4. Code Review
 
 - Review the merged changes
 - Verify feature markers (`// FEATURE: Barcode Permission Control`) are present
