@@ -36,6 +36,20 @@ This feature requires the following to exist in the main codebase:
 
 All of these dependencies already exist in the main Morpheus codebase - no new dependencies are required.
 
+## Backend Configuration Required
+
+**IMPORTANT:** For this feature to work correctly, the `barcode_app` permission must be removed from the `viewer-policy` in the backend configuration file:
+
+**File:** `django_server/api/resources/default_policies.json`
+
+**Change:** Remove `"barcode_app"` from the `viewer-policy` permissions list (line ~36). Keep it in `staff-policy` only.
+
+This ensures that only staff users have access to barcode features, not regular viewers.
+
+**Note:** After modifying `default_policies.json`, you may need to:
+1. Re-run the organization setup routine to apply changes to existing organizations
+2. Or manually update existing policies in the database
+
 ## How It Works
 
 The feature uses the existing permission system in Morpheus:
